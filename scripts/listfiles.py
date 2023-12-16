@@ -1,9 +1,10 @@
 import os
 import tkinter as tk
 from tkinter import filedialog
+from tqdm import tqdm
 
 def human_readable_size(size, decimal_places=1):
-    size = float(size)  # sizeをfloat型に変換
+    size = float(size)
     for unit in ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']:
         if size < 1024.0 or unit == 'YB':
             break
@@ -19,6 +20,9 @@ def list_files_with_human_readable_size(startpath, output_file):
             for line in f:
                 existing_files.add(line.split('   ')[-1].strip())
 
+    total_files = sum([len(files) for _, _, files in os.walk(startpath)])
+    progress_bar = tqdm(total=total_files, desc="Processing Files", unit="file")
+
     with open(output_file, "a", encoding='utf-8') as f:
         for root, dirs, files in os.walk(startpath):
             for file in files:
@@ -27,15 +31,14 @@ def list_files_with_human_readable_size(startpath, output_file):
                     size = os.path.getsize(file_path)
                     readable_size = human_readable_size(size)
                     f.write(f"{readable_size}   {file_path}\n")
+                progress_bar.update(1)
+    progress_bar.close()
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.withdraw()  # GUIを隠す
+    root.withdraw()
 
-    # ディレクトリ選択ダイアログを表示
     directory_path = filedialog.askdirectory(title="ディレクトリを選択してください")
-
-    # 出力ファイル選択ダイアログを表示
     output_file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text files", "*.txt")])
 
     if directory_path and output_file_path:
