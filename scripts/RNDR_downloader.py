@@ -9,6 +9,8 @@ root.withdraw()
 
 file_path = filedialog.askopenfilename(filetypes=[("テキストファイル", "*.txt")])
 
+# テキストファイルのあるディレクトリを取得
+file_dir = os.path.dirname(file_path)
 file_name = os.path.splitext(os.path.basename(file_path))[0]
 
 downloads = {}
@@ -31,7 +33,8 @@ for line in lines:
     filename_removed = filename_in_url.replace(file_name, "").strip('_')
     directory = filename_removed.split('_')[0]
 
-    download_dir = os.path.join(file_name, directory)
+    # ダウンロード先ディレクトリをテキストファイルのあるディレクトリに設定
+    download_dir = os.path.join(file_dir, file_name, directory)
     os.makedirs(download_dir, exist_ok=True)
 
     if download_dir not in downloads:
